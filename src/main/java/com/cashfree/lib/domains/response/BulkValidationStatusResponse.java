@@ -1,5 +1,6 @@
 package com.cashfree.lib.domains.response;
 
+import java.util.Map;
 import java.math.BigDecimal;
 
 import lombok.Data;
@@ -10,31 +11,37 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 public class BulkValidationStatusResponse extends CfPayoutsResponse {
-  private String bulkValidationId;
-
-  private Payload[] entries;
+  private Payload data;
 
   @Data
   @Accessors(chain = true)
-  public final class Payload {
-    private String name;
+  public static final class Payload {
+    private String bulkValidationId;
 
-    private String phone;
+    private Map<String, Entry> entries;
 
-    private String bankAccount;
+    @Data
+    @Accessors(chain = true)
+    public static final class Entry {
+      private String name;
 
-    private String ifsc;
+      private String phone;
 
-    private String accountExists;
+      private String bankAccount;
 
-    private String nameAtBank;
+      private String ifsc;
 
-    private BigDecimal amountDeposited;
+      private String accountExists;
 
-    private String utr;
+      private String nameAtBank;
 
-    private String refId;
+      private BigDecimal amountDeposited;
 
-    private String message;
+      private String utr;
+
+      private String refId;
+
+      private String message;
+    }
   }
 }

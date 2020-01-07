@@ -4,6 +4,6 @@ public class ResourceAlreadyExistsException extends RuntimeException {
   public ResourceAlreadyExistsException() { super(""); }
 
   public ResourceAlreadyExistsException(String str) {
-    super();
+    super(str);
   }
 }

@@ -4,6 +4,6 @@ public class IllegalPayloadException extends RuntimeException {
   public IllegalPayloadException() { super(""); }
 
   public IllegalPayloadException(String str) {
-    super();
+    super(str);
   }
 }

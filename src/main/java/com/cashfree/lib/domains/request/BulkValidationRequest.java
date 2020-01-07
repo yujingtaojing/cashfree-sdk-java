@@ -3,6 +3,8 @@ package com.cashfree.lib.domains.request;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 @Accessors(chain = true)
 public class BulkValidationRequest {
@@ -12,13 +14,17 @@ public class BulkValidationRequest {
 
   @Data
   @Accessors(chain = true)
-  public final class Payload {
+  public static final class Payload {
+    @NotNull
     private String name;
 
+    @NotNull
     private String phone;
 
+    @NotNull
     private String bankAccount;
 
+    @NotNull
     private String ifsc;
   }
 }

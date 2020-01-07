@@ -7,6 +7,6 @@ public class UnknownExceptionOccured extends RuntimeException {
   }
 
   public UnknownExceptionOccured(String str) {
-    super(str + "Please reach out to care@cashfreemail.com");
+    super(str + " Please reach out to care@cashfreemail.com");
   }
 }

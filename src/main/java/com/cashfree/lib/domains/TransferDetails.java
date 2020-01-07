@@ -6,7 +6,11 @@ import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import com.cashfree.lib.serializers.CustomDateSerializer;
+import com.cashfree.lib.serializers.CustomDateDeserializer;
 
 @Data
 @Accessors(chain = true)
@@ -23,10 +27,12 @@ public class TransferDetails {
 
   private String utr;
 
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @JsonSerialize(using = CustomDateSerializer.class)
+  @JsonDeserialize(using = CustomDateDeserializer.class)
   private LocalDateTime addedOn;
 
-  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @JsonSerialize(using = CustomDateSerializer.class)
+  @JsonDeserialize(using = CustomDateDeserializer.class)
   private LocalDateTime processedOn;
 
   private Integer acknowledged;

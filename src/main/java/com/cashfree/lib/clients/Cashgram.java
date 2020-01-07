@@ -1,6 +1,7 @@
 package com.cashfree.lib.clients;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.cashfree.lib.domains.CashgramDetails;
 import com.cashfree.lib.domains.request.DeactivateCashgramRequest;
@@ -31,15 +32,16 @@ public class Cashgram {
     } else if (HttpStatus.CONFLICT.value() == body.getSubCode()) {
       throw new ResourceAlreadyExistsException("Cashgram with id " + cashgram.getCashgramId() + " already exists");
     } else if (HttpStatus.UNPROCESSABLE_ENTITY.value() == body.getSubCode()) {
-      throw new IllegalPayloadException("Remarks can have only numbers, alphabets and whitespaces");
+      throw new IllegalPayloadException(body.getMessage());
     }
     throw new UnsupportedOperationException("Unable to create cashgram.");
   }
 
   public GetCashgramStatusResponse.Payload getCashgramStatus(String cashgramId) {
-    GetCashgramStatusResponse body = payouts.performGetRequest(
-        PayoutConstants.GET_CASHGRAM_STATUS_REL_URL,
-        GetCashgramStatusResponse.class, cashgramId);
+    UriComponentsBuilder uri = UriComponentsBuilder.fromUriString(PayoutConstants.GET_CASHGRAM_STATUS_REL_URL)
+        .queryParam("cashgramId", cashgramId);
+
+    GetCashgramStatusResponse body = payouts.performGetRequest(uri.toUriString(), GetCashgramStatusResponse.class);
     if (HttpStatus.OK.value() == body.getSubCode()) {
       return body.getData();
     } else if (HttpStatus.NOT_FOUND.value() == body.getSubCode()) {

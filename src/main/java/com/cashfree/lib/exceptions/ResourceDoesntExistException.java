@@ -6,6 +6,6 @@ public class ResourceDoesntExistException extends RuntimeException {
   }
 
   public ResourceDoesntExistException(String str) {
-    super("str");
+    super(str);
   }
 }

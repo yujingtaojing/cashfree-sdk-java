@@ -2,8 +2,11 @@ package com.cashfree.lib.clients;
 
 import java.util.List;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.cashfree.lib.exceptions.IllegalPayloadException;
@@ -36,10 +39,14 @@ public class Transfers {
         RequestTransferResponse.class);
     if (HttpStatus.OK.value() == body.getSubCode()) {
       return body.getData();
+    } else if (HttpStatus.CREATED.value() == body.getSubCode()) {
+      return body.getData();
     } else if (HttpStatus.NOT_FOUND.value() == body.getSubCode()) {
       throw new ResourceDoesntExistException("Beneficiary does not exist");
     } else if (HttpStatus.CONFLICT.value() == body.getSubCode()) {
-      throw new IllegalPayloadException("Remarks can have only numbers, alphabets and whitespaces");
+      throw new IllegalPayloadException(body.getMessage());
+    } else if (HttpStatus.PRECONDITION_FAILED.value() == body.getSubCode()) {
+      throw new IllegalPayloadException(body.getMessage());
     }
     throw new UnknownExceptionOccured();
   }
@@ -48,9 +55,15 @@ public class Transfers {
     if (StringUtils.isBlank(referenceId) && StringUtils.isBlank(transferId)) {
       throw new IllegalPayloadException("Either referenceId or transferId is mandatory to retrieve status of the transfer");
     }
-    GetTransferResponse body = payouts.performGetRequest(
-        PayoutConstants.GET_TRANSFER_STATUS_REL_URL,
-        GetTransferResponse.class, transferId);
+
+    UriComponentsBuilder uri = UriComponentsBuilder.fromUriString(PayoutConstants.GET_TRANSFER_STATUS_REL_URL);
+    if (StringUtils.isNotBlank(transferId)) {
+      uri.queryParam("transferId", transferId);
+    }
+    if (StringUtils.isNotBlank(referenceId)) {
+      uri.queryParam("referenceId", referenceId);
+    }
+    GetTransferResponse body = payouts.performGetRequest(uri.toUriString(), GetTransferResponse.class);
     if (HttpStatus.OK.value() == body.getSubCode()) {
       return body.getData().getTransfer();
     } else if (HttpStatus.NOT_FOUND.value() == body.getSubCode()) {
@@ -60,9 +73,24 @@ public class Transfers {
   }
 
   public List<TransferDetails> getTransfers(Integer maxReturn, Integer lastReturnId, LocalDateTime date) {
-    GetTransfersResponse body = payouts.performGetRequest(
-        PayoutConstants.GET_TRANSFERS_REL_URL,
-        GetTransfersResponse.class, maxReturn, lastReturnId, date);
+    UriComponentsBuilder uri = UriComponentsBuilder.fromUriString(PayoutConstants.GET_TRANSFERS_REL_URL);
+    if (maxReturn != null) {
+      uri.queryParam("maxReturn", maxReturn);
+    }
+    if (lastReturnId == null) {
+      uri.queryParam("lastReturnId", lastReturnId);
+    }
+    if (date != null) {
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+      uri.queryParam("date", formatter.format(date));
+    }
+
+    return getTransfers(uri.toUriString());
+  }
+
+  public List<TransferDetails> getTransfers(String relUrl) {
+    GetTransfersResponse body = payouts.performGetRequest(relUrl, GetTransfersResponse.class);
     if (HttpStatus.OK.value() == body.getSubCode()) {
       return body.getData().getTransfers();
     } else if (HttpStatus.PRECONDITION_FAILED.value() == body.getSubCode()) {
@@ -71,13 +99,13 @@ public class Transfers {
     throw new UnknownExceptionOccured();
   }
 
-  public List<RequestTransferResponse> requestBatchTransfer(BatchTransferRequest batchTransferRequest) {
+  public BatchTransferResponse.Payload requestBatchTransfer(BatchTransferRequest batchTransferRequest) {
     BatchTransferResponse body = payouts.performPostRequest(
         PayoutConstants.REQUEST_BATCH_TRANSFER_REL_URL,
         batchTransferRequest,
         BatchTransferResponse.class);
     if (HttpStatus.OK.value() == body.getSubCode()) {
-      return body.getBatch();
+      return body.getData();
     } else if (HttpStatus.CONFLICT.value() == body.getSubCode()) {
       throw new ResourceAlreadyExistsException("Batch transferId alrady exists");
     } else if (HttpStatus.PRECONDITION_FAILED.value() == body.getSubCode()) {
@@ -86,10 +114,11 @@ public class Transfers {
     throw new UnknownExceptionOccured();
   }
 
-  public List<TransferDetails> getBatchTransferStatus(String batchTransferId) {
-    BatchTransferStatusResponse body = payouts.performGetRequest(
-        PayoutConstants.GET_BATCH_TRANSFER_STATUS_REL_URL,
-        BatchTransferStatusResponse.class, batchTransferId);
+  public List<BatchTransferStatusResponse.Payload.Transfer> getBatchTransferStatus(String batchTransferId) {
+    UriComponentsBuilder uri = UriComponentsBuilder.fromUriString(PayoutConstants.GET_BATCH_TRANSFER_STATUS_REL_URL)
+        .queryParam("batchTransferId", batchTransferId);
+
+    BatchTransferStatusResponse body = payouts.performGetRequest(uri.toUriString(), BatchTransferStatusResponse.class);
     if (HttpStatus.OK.value() == body.getSubCode()) {
       return body.getData().getTransfers();
     } else if (HttpStatus.NOT_FOUND.value() == body.getSubCode()) {

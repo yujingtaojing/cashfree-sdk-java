@@ -68,7 +68,7 @@ public class Payouts {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    headers.set("Authorization", bearerToken);
+    headers.set("Authorization", "Bearer " + bearerToken);
 
     return headers;
   }
@@ -124,14 +124,10 @@ public class Payouts {
   }
 
   public <Request, Response extends CfPayoutsResponse> Response
-  performPostRequest(String url, Request request, Class<Response> clazz) {
+  performPostRequest(String relUrl, Request request, Class<Response> clazz) {
     HttpEntity<Request> httpEntity = new HttpEntity<>(request, buildAuthHeader());
     ResponseEntity<Response> response =
-        restTemplate.exchange(
-            endpoint + url,
-            HttpMethod.POST,
-            httpEntity,
-            clazz);
+        restTemplate.exchange(endpoint + relUrl, HttpMethod.POST, httpEntity, clazz);
 
     Response body = response.getBody();
     if (body == null) {
@@ -139,20 +135,15 @@ public class Payouts {
     }
     if (HttpStatus.FORBIDDEN.value() == body.getSubCode()) {
       updateBearerToken();
-      performPostRequest(url, request, clazz);
+      performPostRequest(relUrl, request, clazz);
     }
     return body;
   }
 
-  public <Response extends CfPayoutsResponse> Response
-  performGetRequest(String url, Class<Response> clazz, Object... uriVariables) {
+  public <Response extends CfPayoutsResponse> Response performGetRequest(String relUrl, Class<Response> clazz) {
     HttpEntity<Void> httpEntity = new HttpEntity<>(buildAuthHeader());
     ResponseEntity<Response> response =
-        restTemplate.exchange(
-            endpoint + url,
-            HttpMethod.POST,
-            httpEntity,
-            clazz, uriVariables);
+        restTemplate.exchange(endpoint + relUrl, HttpMethod.GET, httpEntity, clazz);
 
     Response body = response.getBody();
     if (body == null) {
@@ -160,7 +151,7 @@ public class Payouts {
     }
     if (HttpStatus.FORBIDDEN.value() == body.getSubCode()) {
       updateBearerToken();
-      performGetRequest(url, clazz, uriVariables);
+      performGetRequest(relUrl, clazz);
     }
     return body;
   }

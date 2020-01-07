@@ -1,12 +1,14 @@
 package com.cashfree.lib.clients;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.cashfree.lib.exceptions.UnknownExceptionOccured;
 import com.cashfree.lib.exceptions.ResourceDoesntExistException;
 import com.cashfree.lib.exceptions.ResourceAlreadyExistsException;
 
 import com.cashfree.lib.domains.BeneficiaryDetails;
+import com.cashfree.lib.exceptions.IllegalPayloadException;
 import com.cashfree.lib.domains.response.CfPayoutsResponse;
 import com.cashfree.lib.domains.request.RemoveBeneficiaryRequest;
 import com.cashfree.lib.domains.response.GetBeneficiaryResponse;
@@ -50,8 +52,13 @@ public class Beneficiary {
   }
 
   public String getBeneficiaryId(String bankAccount, String ifsc) {
+    UriComponentsBuilder uri = UriComponentsBuilder.fromUriString(PayoutConstants.GET_BENE_ID_REL_URL)
+        .queryParam("bankAccount", bankAccount)
+        .queryParam("ifsc", ifsc);
+
     GetBeneficiaryIdResponse body = payouts.performGetRequest(
-        PayoutConstants.GET_BENE_ID_REL_URL, GetBeneficiaryIdResponse.class, bankAccount, ifsc);
+        uri.toUriString(), GetBeneficiaryIdResponse.class);
+    System.out.println(body);
     if (HttpStatus.OK.value() == body.getSubCode()) {
       return body.getData().getBeneId();
     } else if (HttpStatus.FORBIDDEN.value() == body.getSubCode()) {
@@ -63,13 +70,14 @@ public class Beneficiary {
   public boolean removeBeneficiary(String beneId) {
     CfPayoutsResponse body = payouts.performPostRequest(
         PayoutConstants.REMOVE_BENEFICIARY_REL_URL, new RemoveBeneficiaryRequest().setBeneId(beneId), CfPayoutsResponse.class);
+    System.out.println(body);
     if (HttpStatus.OK.value() == body.getSubCode()) {
       return true;
-    } else if (HttpStatus.FORBIDDEN.value() == body.getSubCode()) {
+    } else if (HttpStatus.NOT_FOUND.value() == body.getSubCode()) {
       throw new ResourceDoesntExistException("Beneficiary does not exist with given Id");
     } else if (HttpStatus.PRECONDITION_FAILED.value() == body.getSubCode()) {
-      throw new UnknownExceptionOccured("beneId missing in the request");
+      throw new IllegalPayloadException("beneId missing in the request");
     }
-    throw new UnknownExceptionOccured("Unable to fetch beneficiary id");
+    throw new UnknownExceptionOccured("Unable to remove beneficiary with id " + beneId);
   }
 }

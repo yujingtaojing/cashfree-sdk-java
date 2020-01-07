@@ -17,7 +17,7 @@ public class BankDetailsValidationResponse extends CfPayoutsResponse {
   public static final class Payload {
     private String nameAtBank;
 
-    private Boolean accountExists;
+    private String accountExists;
 
     private BigDecimal amountDeposited;
 

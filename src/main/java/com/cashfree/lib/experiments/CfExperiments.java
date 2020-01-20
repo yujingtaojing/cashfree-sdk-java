@@ -7,12 +7,19 @@ import java.time.LocalDateTime;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.cashfree.lib.clients.*;
+import com.cashfree.lib.clients.Payouts;
+import com.cashfree.lib.clients.Cashgram;
+import com.cashfree.lib.clients.Transfers;
+import com.cashfree.lib.clients.Validation;
+import com.cashfree.lib.clients.Beneficiary;
 import com.cashfree.lib.domains.CashgramDetails;
 import com.cashfree.lib.domains.BeneficiaryDetails;
 import com.cashfree.lib.constants.Constants.Environment;
 import com.cashfree.lib.exceptions.IllegalPayloadException;
+import com.cashfree.lib.domains.response.CfPayoutsResponse;
+import com.cashfree.lib.domains.response.GetBalanceResponse;
 import com.cashfree.lib.domains.request.BatchTransferRequest;
+import com.cashfree.lib.domains.request.SelfWithdrawalRequest;
 import com.cashfree.lib.domains.request.BulkValidationRequest;
 import com.cashfree.lib.domains.request.RequestTransferRequest;
 import com.cashfree.lib.exceptions.ResourceDoesntExistException;
@@ -21,10 +28,9 @@ import com.cashfree.lib.exceptions.ResourceAlreadyExistsException;
 @Slf4j
 public class CfExperiments {
   public static void main(String[] args) throws IOException {
-    Payouts payouts = new Payouts(
+    Payouts payouts = Payouts.getInstance(
         Environment.PRODUCTION, "CF1848EZPSGLHWP9IUE2Y", "b8df7784dd3f38911294d3597764dd43f3016a48");
-
-    payouts.updateBearerToken();
+    log.info("" + payouts.init());
 
     boolean isTokenValid = payouts.verifyToken();
     log.info("" + isTokenValid);
@@ -150,6 +156,7 @@ public class CfExperiments {
         .setLinkExpiry(LocalDateTime.now().plusMinutes(0))
         .setRemarks("api")
         .setNotifyCustomer(1);
+
     try {
       log.info("" + cashgram.createCashgram(cashgramDetails));
     } catch (IllegalPayloadException | ResourceAlreadyExistsException x) {
@@ -157,5 +164,17 @@ public class CfExperiments {
     }
     log.info("" + cashgram.getCashgramStatus("javasdk-test2"));
     log.info("" + cashgram.deactivateCashgram("javasdk-test2"));
+  }
+
+  private static void testPayoutEndpoints(Payouts payouts) {
+    payouts.init();
+
+    GetBalanceResponse.LedgerDetails ledgerDetails = payouts.getBalance();
+
+    SelfWithdrawalRequest selfWithdrawalRequest = new SelfWithdrawalRequest()
+        .setWithdrawalId("withdraw1")
+        .setAmount(new BigDecimal("2"))
+        .setRemarks("Sample Withdrawal Request");
+    CfPayoutsResponse withdrawalResponse = payouts.selfWithdrawal(selfWithdrawalRequest);
   }
 }

@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.cashfree.lib.domains.request.SelfWithdrawalRequest;
 import org.yaml.snakeyaml.Yaml;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,12 +35,15 @@ public class Payouts {
   private String endpoint;
   private String bearerToken;
 
+  private boolean isInitialized = false;
+  private static Payouts SINGLETON_INSTANCE;
+
   private Payouts() {
     RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
     this.restTemplate = restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(10)).build();
   }
 
-  public Payouts(Environment env, String clientId, String clientSecret) throws IOException {
+  private Payouts(Environment env, String clientId, String clientSecret) throws IOException {
     this();
 
     this.clientId = clientId;
@@ -59,6 +63,23 @@ public class Payouts {
     }
   }
 
+  public static Payouts getInstance(Environment env, String clientId, String clientSecret) throws IOException {
+    if (SINGLETON_INSTANCE == null) {
+      SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret);
+    }
+    return SINGLETON_INSTANCE;
+  }
+
+  public boolean init() {
+    try {
+      updateBearerToken();
+      isInitialized = true;
+      return true;
+    } catch (Exception x) {
+      return false;
+    }
+  }
+
   private void loadConfig(InputStream is) {
     Yaml yaml = new Yaml();
     this.conf = yaml.loadAs(is, ConfigParams.class);
@@ -73,7 +94,7 @@ public class Payouts {
     return headers;
   }
 
-  public void updateBearerToken() {
+  void updateBearerToken() {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -123,7 +144,7 @@ public class Payouts {
     return false;
   }
 
-  public <Request, Response extends CfPayoutsResponse> Response
+  <Request, Response extends CfPayoutsResponse> Response
   performPostRequest(String relUrl, Request request, Class<Response> clazz) {
     HttpEntity<Request> httpEntity = new HttpEntity<>(request, buildAuthHeader());
     ResponseEntity<Response> response =
@@ -140,7 +161,7 @@ public class Payouts {
     return body;
   }
 
-  public <Response extends CfPayoutsResponse> Response performGetRequest(String relUrl, Class<Response> clazz) {
+  <Response extends CfPayoutsResponse> Response performGetRequest(String relUrl, Class<Response> clazz) {
     HttpEntity<Void> httpEntity = new HttpEntity<>(buildAuthHeader());
     ResponseEntity<Response> response =
         restTemplate.exchange(endpoint + relUrl, HttpMethod.GET, httpEntity, clazz);
@@ -165,7 +186,12 @@ public class Payouts {
     throw new UnknownExceptionOccured("Unable to fetch beneficiary id");
   }
 
-  public void selfWithdrawal() {
-
+  public CfPayoutsResponse selfWithdrawal(SelfWithdrawalRequest selfWithdrawalRequest) {
+    CfPayoutsResponse body = performPostRequest(
+        PayoutConstants.SELF_WITHDRAWAL_REL_URL, SelfWithdrawalRequest.class, CfPayoutsResponse.class);
+    if (HttpStatus.OK.value() == body.getSubCode()) {
+      return body;
+    }
+    throw new UnknownExceptionOccured("Unable to fetch beneficiary id");
   }
 }

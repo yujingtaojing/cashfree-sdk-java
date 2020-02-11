@@ -1,17 +1,13 @@
 package com.cashfree.lib.serializers;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
 import com.cashfree.lib.constants.Constants;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 
-public class CustomDateSerializer extends JsonSerializer<LocalDateTime> {
+public class CustomDateSerializer implements JsonFieldSerializer<LocalDateTime> {
   private final DateTimeFormatter dateTimeFormatter;
 
   private CustomDateSerializer(final String format) {
@@ -28,11 +24,11 @@ public class CustomDateSerializer extends JsonSerializer<LocalDateTime> {
   }
 
   @Override
-  public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+  public String serialize(LocalDateTime value) {
     if (value == null) {
-      gen.writeNull();
+      return null;
     } else {
-      gen.writeString(dateTimeFormatter.format(value));
+      return dateTimeFormatter.format(value);
     }
   }
 }

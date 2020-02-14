@@ -5,6 +5,10 @@ import com.eclipsesource.json.Json;
 import com.cashfree.lib.payout.domains.response.AuthenticationResponse;
 
 public class ObjectMapperTest {
+  public static void main(String[] args) {
+    new ObjectMapperTest().testObjectMapperWithInheritance();
+  }
+
   public void testObjectMapperWithInheritance() {
     String str = "{\"status\":\"SUCCESS\",\"subCode\":\"200\",\"message\":\"Token generated\",\"data\":{\"token\":\"IIII\",\"expiry\":1580902627}}";
 

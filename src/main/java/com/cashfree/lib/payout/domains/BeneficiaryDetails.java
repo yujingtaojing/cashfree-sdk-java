@@ -33,13 +33,4 @@ public class BeneficiaryDetails {
   private String state;
 
   private String pincode;
-
-  /**
-   * @param beneId Can be only string without special characters.
-   * @return
-   */
-  public BeneficiaryDetails setBeneId(String beneId) {
-    this.beneId = beneId;
-    return this;
-  }
 }

@@ -1,6 +1,5 @@
 package com.cashfree.lib.payout.clients;
 
-import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -9,7 +8,6 @@ import com.cashfree.lib.exceptions.UnknownExceptionOccured;
 import com.cashfree.lib.exceptions.ResourceDoesntExistException;
 import com.cashfree.lib.exceptions.ResourceAlreadyExistsException;
 
-import com.cashfree.lib.payout.domains.TransferDetails;
 import com.cashfree.lib.payout.domains.request.BatchTransferRequest;
 import com.cashfree.lib.payout.domains.response.GetTransferResponse;
 import com.cashfree.lib.payout.domains.response.GetTransfersResponse;

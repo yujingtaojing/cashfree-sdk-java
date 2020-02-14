@@ -74,7 +74,7 @@ public class ObjectWriterUtils {
   }
 
   @SuppressWarnings("deprecation")
-  private static Object getField(Field field, Object object) {
+  public static Object getField(Field field, Object object) {
     boolean isFieldAccessible = field.isAccessible();
     if (!isFieldAccessible) {
       field.setAccessible(true);

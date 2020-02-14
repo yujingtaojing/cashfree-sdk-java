@@ -20,10 +20,8 @@ public class ListTransactionsRequest {
 
   private String txStatus;
 
-  @NotNull
   private String lastId;
 
-  @NotNull
   private Integer count;
 
   public ListTransactionsRequest setStartDate(LocalDateTime startDate) {

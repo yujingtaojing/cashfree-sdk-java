@@ -71,7 +71,6 @@ public class PgExperiments {
   }
 
   private static void verifyTransactionsEndpoints(Transactions transactions) {
-    // 2018-01-01&endDate=2018-01-11&txStatus=SUCCESS&lastId=&count=
     ListTransactionsRequest listTransactionsRequest =
         new ListTransactionsRequest()
             .setStartDate(LocalDateTime.of(2018, 1, 1, 1, 1))

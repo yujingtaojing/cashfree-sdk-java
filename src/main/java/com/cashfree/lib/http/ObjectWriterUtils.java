@@ -55,7 +55,13 @@ public class ObjectWriterUtils {
         fieldValueAsString = serialize == null ?
             writeValue(fieldClass) : getFieldInstanceUsingCustomSerializer(serialize, fieldValue);
       }
-      jsonObject.set(fieldName, fieldValueAsString);
+      if ("java.lang.Integer".equals(fieldClass.getName())) {
+        jsonObject.set(fieldName, Integer.parseInt(fieldValueAsString));
+      } else if ("java.lang.Boolean".equals(fieldClass.getName())) {
+        jsonObject.set(fieldName, Boolean.parseBoolean(fieldValueAsString));
+      } else {
+        jsonObject.set(fieldName, fieldValueAsString);
+      }
     }
     return jsonObject.toString()
         .replaceAll("\\\\", "")

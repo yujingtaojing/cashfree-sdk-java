@@ -45,6 +45,7 @@ public class BatchTransferStatusResponse extends CfPayoutsResponse {
 
     private Integer referenceId;
 
+    @Deserialize(using = ListDeserializer.class)
     private List<Transfer> transfers;
 
     @Data

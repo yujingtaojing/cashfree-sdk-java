@@ -60,7 +60,7 @@ public class Beneficiary {
 
     if (200 == body.getSubCode()) {
       return body.getData().getBeneId();
-    } else if (403 == body.getSubCode()) {
+    } else if (404 == body.getSubCode() || 403 == body.getSubCode()) {
       throw new ResourceDoesntExistException("Beneficiary not found with given bank account details");
     }
     throw new UnknownExceptionOccured("Unable to fetch beneficiary id");

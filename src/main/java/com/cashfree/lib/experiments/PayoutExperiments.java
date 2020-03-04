@@ -55,6 +55,7 @@ public class PayoutExperiments {
     testValidationEndpoints(new Validation(payouts));
     testTransfersEndpionts(new Transfers(payouts));
     testCashgramEndpoints(new Cashgram(payouts));
+
   }
 
   private static void testBeneficiaryEndpoints(Beneficiary beneficiary) {

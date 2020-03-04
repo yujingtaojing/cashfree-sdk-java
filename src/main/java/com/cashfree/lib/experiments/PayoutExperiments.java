@@ -50,11 +50,13 @@ public class PayoutExperiments {
     log.info("" + isTokenValid);
     if (!isTokenValid) return;
 
-    // testPayoutEndpoints(payouts);
+    testPayoutEndpoints(payouts);
     testBeneficiaryEndpoints(new Beneficiary(payouts));
-    // testValidationEndpoints(new Validation(payouts));
-   // testTransfersEndpionts(new Transfers(payouts));
-    // testCashgramEndpoints(new Cashgram(payouts));
+    testValidationEndpoints(new Validation(payouts));
+    testTransfersEndpionts(new Transfers(payouts));
+    testCashgramEndpoints(new Cashgram(payouts));
+
+
   }
 
   private static void testBeneficiaryEndpoints(Beneficiary beneficiary) {

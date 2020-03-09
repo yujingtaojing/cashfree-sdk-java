@@ -21,12 +21,12 @@ import com.cashfree.lib.payout.clients.Beneficiary;
 
 import com.cashfree.lib.payout.domains.CashgramDetails;
 import com.cashfree.lib.payout.domains.BeneficiaryDetails;
-import com.cashfree.lib.payout.domains.response.BatchTransferResponse;
 import com.cashfree.lib.payout.domains.response.CfPayoutsResponse;
 import com.cashfree.lib.payout.domains.response.GetBalanceResponse;
 import com.cashfree.lib.payout.domains.request.BatchTransferRequest;
 import com.cashfree.lib.payout.domains.request.SelfWithdrawalRequest;
 import com.cashfree.lib.payout.domains.request.BulkValidationRequest;
+import com.cashfree.lib.payout.domains.response.BatchTransferResponse;
 import com.cashfree.lib.payout.domains.request.RequestTransferRequest;
 import com.cashfree.lib.payout.domains.response.BulkValidationResponse;
 

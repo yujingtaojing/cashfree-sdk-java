@@ -55,8 +55,6 @@ public class PayoutExperiments {
     testValidationEndpoints(new Validation(payouts));
     testTransfersEndpionts(new Transfers(payouts));
     testCashgramEndpoints(new Cashgram(payouts));
-
-
   }
 
   private static void testBeneficiaryEndpoints(Beneficiary beneficiary) {
@@ -78,7 +76,7 @@ public class PayoutExperiments {
       log.warning(x.getMessage());
     }
     try {
-      //log.info("" + beneficiary.getBeneficiaryDetails("JOHN18012"));
+      log.info("" + beneficiary.getBeneficiaryDetails("JOHN18012"));
       log.info("" + beneficiary.getBeneficiaryId("00001111222238", "HDFC0000001"));
     } catch (ResourceDoesntExistException x) {
       log.warning(x.getMessage());

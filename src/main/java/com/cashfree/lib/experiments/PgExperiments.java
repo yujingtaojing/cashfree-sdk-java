@@ -28,7 +28,7 @@ public class PgExperiments {
 
   public static void main(String[] args) {
     Pg pg = Pg.getInstance(
-        Constants.Environment.PRODUCTION, "1848d0ce8441fb8ffa258bc98481", "62f1476aee1c57c7bef6259e104f9a868b068ed6");
+        Constants.Environment.PRODUCTION, "appId", "secretKey");
 
     log.info("Verifying Credentials: " + pg.verifyCredentials());
 

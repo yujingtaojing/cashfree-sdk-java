@@ -43,7 +43,7 @@ public class PayoutExperiments {
   
   public static void main(String[] args) {
     Payouts payouts = Payouts.getInstance(
-        Environment.PRODUCTION, "CF1848EZPSGLHWP9IUE2Y", "b8df7784dd3f38911294d3597764dd43f3016a48");
+        Environment.PRODUCTION, "clientId", "clientSecret");
     log.info("" + payouts.init());
 
     boolean isTokenValid = payouts.verifyToken();

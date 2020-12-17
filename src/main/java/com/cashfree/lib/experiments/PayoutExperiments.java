@@ -65,6 +65,8 @@ public class PayoutExperiments {
         .setPhone("9876543210")
         .setBankAccount("00001111222233")
         .setIfsc("HDFC0000001")
+        .setVpa("johndoe@hdfcbank")
+        .setCardNo("4111111111111111")
         .setAddress1("ABC Street")
         .setCity("Bangalore")
         .setState("Karnataka")

@@ -1,13 +1,10 @@
 package com.cashfree.lib.payout.domains.response;
 
-import lombok.Data;
-import lombok.ToString;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
-
 import com.cashfree.lib.annotations.NotNull;
-
-import com.cashfree.lib.payout.domains.BeneficiaryDetails;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
@@ -35,6 +32,10 @@ public class GetBeneficiaryResponse extends CfPayoutsResponse {
 
     private String ifsc;
 
+    private String vpa;
+
+    private String maskedCard;
+
     private String address1;
 
     private String city;
@@ -45,19 +46,6 @@ public class GetBeneficiaryResponse extends CfPayoutsResponse {
 
     private String status;
 
-    public BeneficiaryDetails getBeneficiaryDetails() {
-      return new BeneficiaryDetails()
-          .setBeneId(beneId)
-          .setName(name)
-          .setEmail(email)
-          .setPhone(phone)
-          .setBankAccount(bankAccount)
-          .setIfsc(ifsc)
-          .setAddress1(address1)
-          .setCity(city)
-          .setState(state)
-          .setPincode(pincode);
-    }
   }
 }
 

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.cashfree</groupId>
 	<artifactId>cashfreelibjava</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.5</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -136,7 +136,7 @@
 		<connection>scm:git:git://github.com/cashfree/cashfree-sdk-java.git</connection>
 		<developerConnection>scm:git:git@github.com:cashfree/cashfree-sdk-java.git</developerConnection>
 		<url>https://github.com/cashfree/cashfree-sdk-java</url>
-		<tag>HEAD</tag>
+		<tag>cashfreelibjava-0.0.5</tag>
 	</scm>
 
 	<distributionManagement>

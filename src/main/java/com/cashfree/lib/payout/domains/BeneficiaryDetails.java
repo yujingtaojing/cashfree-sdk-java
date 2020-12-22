@@ -1,10 +1,9 @@
 package com.cashfree.lib.payout.domains;
 
+import com.cashfree.lib.annotations.NotNull;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import com.cashfree.lib.annotations.NotNull;
 
 @Data
 @ToString(callSuper=true)
@@ -25,6 +24,10 @@ public class BeneficiaryDetails {
   private String bankAccount;
 
   private String ifsc;
+
+  private String vpa;
+
+  private String cardNo;
 
   private String address1;
 

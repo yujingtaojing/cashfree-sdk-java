@@ -1,18 +1,16 @@
 package com.cashfree.lib.payout.clients;
 
-import com.cashfree.lib.exceptions.UnknownExceptionOccured;
 import com.cashfree.lib.exceptions.IllegalPayloadException;
-import com.cashfree.lib.exceptions.ResourceDoesntExistException;
 import com.cashfree.lib.exceptions.ResourceAlreadyExistsException;
-
-import com.cashfree.lib.payout.domains.BeneficiaryDetails;
-import com.cashfree.lib.payout.domains.response.CfPayoutsResponse;
-import com.cashfree.lib.payout.domains.request.RemoveBeneficiaryRequest;
-import com.cashfree.lib.payout.domains.response.GetBeneficiaryResponse;
-import com.cashfree.lib.payout.domains.response.GetBeneficiaryIdResponse;
-
+import com.cashfree.lib.exceptions.ResourceDoesntExistException;
+import com.cashfree.lib.exceptions.UnknownExceptionOccured;
 import com.cashfree.lib.http.UriBuilder;
 import com.cashfree.lib.payout.constants.PayoutConstants;
+import com.cashfree.lib.payout.domains.BeneficiaryDetails;
+import com.cashfree.lib.payout.domains.request.RemoveBeneficiaryRequest;
+import com.cashfree.lib.payout.domains.response.CfPayoutsResponse;
+import com.cashfree.lib.payout.domains.response.GetBeneficiaryIdResponse;
+import com.cashfree.lib.payout.domains.response.GetBeneficiaryResponse;
 
 public class Beneficiary {
   private Payouts payouts;
@@ -38,11 +36,11 @@ public class Beneficiary {
     return false;
   }
 
-  public BeneficiaryDetails getBeneficiaryDetails(String beneId) {
+  public GetBeneficiaryResponse.Payload getBeneficiaryDetails(String beneId) {
     GetBeneficiaryResponse body = payouts.performGetRequest(
         PayoutConstants.GET_BENEFICIARY_REL_URL + "/" + beneId, GetBeneficiaryResponse.class);
     if (200 == body.getSubCode()) {
-      return body.getData().getBeneficiaryDetails();
+      return body.getData();
     } else if (404 == body.getSubCode()) {
       throw new ResourceDoesntExistException("Beneficiary does not exist");
     }

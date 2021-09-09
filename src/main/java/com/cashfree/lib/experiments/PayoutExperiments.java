@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.logging.Logger;
 import java.util.logging.ConsoleHandler;
 import java.util.concurrent.ThreadLocalRandom;
+import javax.servlet.http.HttpServletRequest;
 
 import com.cashfree.lib.constants.Constants.Environment;
 import com.cashfree.lib.exceptions.IllegalPayloadException;
@@ -42,13 +43,26 @@ public class PayoutExperiments {
   }
   
   public static void main(String[] args) {
+
+    String clientId = "CF27JBMB8GN4CHAQI6Q";
+    String clientSecret = "fd48e5a6084d611e4fd9c6f0f8fcbca16d221ace";
+    Environment env = Environment.TEST;
+    String publicKeyPath = "";
     Payouts payouts = Payouts.getInstance(
-        Environment.PRODUCTION, "clientId", "clientSecret");
+            env,
+            clientId,
+            clientSecret,
+            publicKeyPath );
+
     log.info("" + payouts.init());
 
     boolean isTokenValid = payouts.verifyToken();
     log.info("" + isTokenValid);
-    if (!isTokenValid) return;
+
+    if (!isTokenValid) {
+      System.out.println("INVALID TOKEN");
+      return;
+    }
 
     testPayoutEndpoints(payouts);
     testBeneficiaryEndpoints(new Beneficiary(payouts));
@@ -92,8 +106,9 @@ public class PayoutExperiments {
 
   private static void testValidationEndpoints(Validation validation) {
     log.info("" + validation.validateBankDetails(
-        "JOHN", "9908712345", "026291800001191", "YESB0000262"));
-    log.info("" + validation.validateUPIDetails("Cashfree", "success@upi"));
+            "JOHN Doe", "9908712345", "026291800001191", "YESB0000262"));
+    log.info("" + validation.validateUPIDetails("Shubhankar Saha", "success@upi"));
+
 
     List<BulkValidationRequest.Payload> entries = new ArrayList<>();
     entries.add(new BulkValidationRequest.Payload()
@@ -102,10 +117,10 @@ public class PayoutExperiments {
         .setIfsc("SCBL0036078")
         .setPhone("9015991882"));
     entries.add(new BulkValidationRequest.Payload()
-        .setName("Cashfree Sameera")
-        .setBankAccount("0001001289877623")
-        .setIfsc("SBIN0008752")
-        .setPhone("9023991882"));
+        .setName("Shubhankar Saha")
+        .setBankAccount("387312345234")
+        .setIfsc("SBIN0021161")
+        .setPhone("9073397707"));
     String bulkValidationId = "javasdktest" + ThreadLocalRandom.current().nextInt(0, 1000000);
     BulkValidationRequest request = new BulkValidationRequest()
         .setBulkValidationId(bulkValidationId)
@@ -124,7 +139,7 @@ public class PayoutExperiments {
     String transferId = "javasdktesttransferid" + ThreadLocalRandom.current().nextInt(0, 1000000);
 
     RequestTransferRequest request = new RequestTransferRequest()
-        .setBeneId("VENKY_HDFC")
+        .setBeneId("johndoevalid983")
         .setAmount(new BigDecimal("1.00"))
         .setTransferId(transferId);
     try {
@@ -137,7 +152,7 @@ public class PayoutExperiments {
     } catch (ResourceDoesntExistException x) {
       log.warning(x.getMessage());
     }
-    log.info("" + transfers.getTransfers(10, null, null));
+//    log.info("" + transfers.getTransfers(10, null, null));    //provided for limited merchants
 
     String batchTransferId = "javasdktestbatchtransferid" + ThreadLocalRandom.current().nextInt(0, 1000000);
     List<BatchTransferRequest.Payload> batchTransferRequests = new ArrayList<>();
@@ -179,6 +194,7 @@ public class PayoutExperiments {
     log.info("" + transfers.getBatchTransferStatus(batchTransferId));
   }
 
+
   private static void testCashgramEndpoints(Cashgram cashgram) {
     String cashgramId = "javasdktestcashgram" + ThreadLocalRandom.current().nextInt(0, 1000000);
 
@@ -203,7 +219,6 @@ public class PayoutExperiments {
 
   private static void testPayoutEndpoints(Payouts payouts) {
     payouts.init();
-
     GetBalanceResponse ledgerDetails = payouts.getBalance();
     log.info("" + ledgerDetails);
 

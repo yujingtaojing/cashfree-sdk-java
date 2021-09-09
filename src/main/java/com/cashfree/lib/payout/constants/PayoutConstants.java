@@ -25,7 +25,7 @@ public class PayoutConstants {
 
   public static final String GET_TRANSFER_STATUS_REL_URL = PAYOUT_REL_URL + VERSION + "/getTransferStatus";
 
-  public static final String GET_TRANSFERS_REL_URL = PAYOUT_REL_URL + VERSION + "/getTransfers";
+//  public static final String GET_TRANSFERS_REL_URL = PAYOUT_REL_URL + VERSION + "/getTransfers";
 
   public static final String VALIDATION_BANK_DETAILS_REL_URL = PAYOUT_REL_URL + VERSION + "/validation/bankDetails";
 

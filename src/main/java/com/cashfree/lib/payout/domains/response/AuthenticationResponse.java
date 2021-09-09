@@ -18,5 +18,9 @@ public class AuthenticationResponse extends CfPayoutsResponse {
     private String token;
 
     private Long expiry;
+
+    private Boolean ipAuth;
+
+    private Integer accountId;
   }
 }

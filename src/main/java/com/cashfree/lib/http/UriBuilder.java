@@ -2,6 +2,8 @@ package com.cashfree.lib.http;
 
 import java.util.Map;
 import java.util.HashMap;
+//import javax.ws.rs.core.UriBuilder;
+
 
 /**
  * Primitive uri builder.
@@ -23,6 +25,7 @@ public class UriBuilder {
     if (paramsMap == null) {
       paramsMap = new HashMap<>();
     }
+    paramValue = paramValue.replace(" ", "%20");
     paramsMap.put(paramName, paramValue);
     return this;
   }

@@ -22,11 +22,15 @@ public class BatchTransferRequest {
 
   private List<Payload> batch;
 
+  private String paymentInstrumentId;
+
   @Data
   @Accessors(chain = true)
   public static final class Payload {
+    @NotNull
     private String transferId;
 
+    @NotNull
     private BigDecimal amount;
 
     private String phone;
@@ -40,5 +44,12 @@ public class BatchTransferRequest {
     private String name;
 
     private String remarks;
+
+    private String vpa;
+
+    private String transferMode;
+
+    private String beneId;
+
   }
 }

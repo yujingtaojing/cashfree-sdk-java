@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.logging.Logger;
 import java.util.logging.ConsoleHandler;
 import java.util.concurrent.ThreadLocalRandom;
-import javax.servlet.http.HttpServletRequest;
 
 import com.cashfree.lib.constants.Constants.Environment;
 import com.cashfree.lib.exceptions.IllegalPayloadException;

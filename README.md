@@ -30,8 +30,8 @@ Init the package with your credentials and add the below code in your config.py 
 import com.cashfree.lib.payout.clients.Payouts;
 
 // Get instance for Cashfree Payout
-client_id = ""; //your client id here
-client_secret = ""; //your client secret here
+String clientId = ""; //your client id here
+String clientSecret = ""; //your client secret here
 Payouts payouts = Payouts.getInstance(Environment.PRODUCTION, client_id, client_secret);
 ```
 ##### In case of dynamic IP you will need a public key to generate a signature(which will be done by sdk itself)

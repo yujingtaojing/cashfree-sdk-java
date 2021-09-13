@@ -32,7 +32,7 @@ import com.cashfree.lib.payout.clients.Payouts;
 // Get instance for Cashfree Payout
 client_id = ""; //your client id here
 client_secret = ""; //your client secret here
-public_key_path = ""; //if you have public key, then your path shoul be provided here
+public_key_path = ""; //if you have public key, then your path should be provided here
 Payouts payouts = Payouts.getInstance(Environment.PRODUCTION, client_id, client_secret ,public_key_path );
 ```
 ##### In case of dynamic IP you will need a public key to generate a signature(which will be done by sdk itself)

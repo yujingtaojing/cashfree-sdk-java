@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.*;
 
 import com.cashfree.lib.exceptions.SignatureCreationFailedException;
-import com.cashfree.lib.payout.authorization.Signature;
 import com.cashfree.lib.payout.domains.response.CfPayoutsResponse;
 import com.cashfree.lib.payout.domains.response.GetBalanceResponse;
 import com.cashfree.lib.payout.domains.request.SelfWithdrawalRequest;
@@ -29,14 +28,19 @@ import org.apache.http.client.utils.URIBuilder;
 
 import javax.crypto.Cipher;
 
+import static com.cashfree.lib.constants.Constants.IP;
+import static com.cashfree.lib.constants.Constants.SIGNATURE;
+
 public class Payouts {
 
   private String clientId;
   private String clientSecret;
-  private String signature;
+  private String publicKeyPath;
   private String mode;
   private static String endpoint;
   private String bearerToken;
+
+  private Long expiry;
   private static Payouts SINGLETON_INSTANCE;
 
   private Payouts(Environment env, String clientId, String clientSecret) {
@@ -53,13 +57,17 @@ public class Payouts {
   private Payouts(Environment env, String clientId, String clientSecret , String publicKeyPath) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.mode = "SIGNATURE";
+    if (publicKeyPath.length() == 0)
+      this.mode = IP ;
+    else
+      this.mode = SIGNATURE;
+
     if (Environment.PRODUCTION.equals(env)) {
       this.endpoint = Endpoints.PROD_ENDPOINT;
     } else if (Environment.TEST.equals(env)) {
       this.endpoint = Endpoints.TEST_ENDPOINT;
     }
-    this.signature = generateEncryptedSignature(clientId , publicKeyPath);
+    this.publicKeyPath = publicKeyPath;
   }
 
   public static String getEndpoint() { return endpoint;}
@@ -95,6 +103,7 @@ public class Payouts {
     headersMap.put("X-Client-Secret", clientSecret);
 
     if (mode == "SIGNATURE"){
+      String signature = generateEncryptedSignature(clientId, publicKeyPath);
       if (signature == ""){
         throw new SignatureCreationFailedException();
       }
@@ -106,7 +115,7 @@ public class Payouts {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.AUTH_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     AuthenticationResponse body =
         HttpUtils.performPostRequest(
@@ -120,6 +129,7 @@ public class Payouts {
         throw new UnknownExceptionOccured();
       }
       bearerToken = body.getData().getToken();
+      expiry = body.getData().getExpiry();
     }
     ExceptionThrower.throwException(body.getSubCode() ,
             body.getXRequestId(),
@@ -133,7 +143,7 @@ public class Payouts {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.VERIFY_TOKEN_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     CfPayoutsResponse body =
         HttpUtils.performPostRequest(
@@ -191,7 +201,7 @@ public class Payouts {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_BALANCE_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     GetBalanceResponse body = performGetRequest(
             uriBuilder.toString(), GetBalanceResponse.class);
@@ -210,7 +220,7 @@ public class Payouts {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.SELF_WITHDRAWAL_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     SelfWithdrawalResponse body = performPostRequest(
             uriBuilder.toString(), selfWithdrawalRequest, SelfWithdrawalResponse.class);
@@ -230,23 +240,19 @@ public class Payouts {
     try {
       byte[] keyBytes = Files
               .readAllBytes(new File(pathname).toPath()); // Absolute Path to be replaced
-//                    .readAllBytes(new File("/Users/sameera/Downloads/payout_test_public_key.pem").toPath()); // Absolute Path to be replaced
 
       String publicKeyContent = new String(keyBytes);
-//      System.out.println(publicKeyContent);
       publicKeyContent = publicKeyContent.replaceAll("[\\t\\n\\r]", "")
               .replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
       KeyFactory kf = KeyFactory.getInstance("RSA");
-//      System.out.println(publicKeyContent);
       X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(
               Base64.getDecoder().decode(publicKeyContent));
       RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
       final Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
       cipher.init(Cipher.ENCRYPT_MODE, pubKey);
       encrytedSignature = Base64.getEncoder().encodeToString(cipher.doFinal(clientIdWithEpochTimeStamp.getBytes()));
-//      System.out.println(encrytedSignature);
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new SignatureCreationFailedException(e.getMessage());
     }
     return encrytedSignature;
   }

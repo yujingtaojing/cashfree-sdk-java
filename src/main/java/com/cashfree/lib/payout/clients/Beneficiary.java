@@ -13,6 +13,8 @@ import com.cashfree.lib.payout.domains.response.GetBeneficiaryResponse;
 import com.cashfree.lib.utils.ExceptionThrower;
 import org.apache.http.client.utils.URIBuilder;
 
+import java.net.MalformedURLException;
+
 public class Beneficiary {
   private Payouts payouts;
 
@@ -26,7 +28,7 @@ public class Beneficiary {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.ADD_BENEFICIARY_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+      throw new UnknownExceptionOccured(e.getMessage());
     }
     CfPayoutsResponse body = payouts.performPostRequest(
             uriBuilder.toString(),
@@ -55,7 +57,7 @@ public class Beneficiary {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_BENEFICIARY_REL_URL + "/" + beneId);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     GetBeneficiaryResponse body = payouts.performGetRequest(
             uriBuilder.toString(), GetBeneficiaryResponse.class);
@@ -77,7 +79,7 @@ public class Beneficiary {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_BENE_ID_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
 
     uriBuilder.addParameter("bankAccount", bankAccount);
@@ -103,7 +105,7 @@ public class Beneficiary {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.REMOVE_BENEFICIARY_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     CfPayoutsResponse body = payouts.performPostRequest(
             uriBuilder.toString(), new RemoveBeneficiaryRequest().setBeneId(beneId), CfPayoutsResponse.class);

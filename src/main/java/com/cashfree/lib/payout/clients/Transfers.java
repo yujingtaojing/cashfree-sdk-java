@@ -34,7 +34,7 @@ public class Transfers {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.REQUEST_TRANSFER_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     RequestTransferResponse body = payouts.performPostRequest(
             uriBuilder.toString(),
@@ -58,7 +58,7 @@ public class Transfers {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_TRANSFER_STATUS_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
 
     if (CommonUtils.isNotBlank(transferId)) {
@@ -86,7 +86,7 @@ public class Transfers {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.REQUEST_BATCH_TRANSFER_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     BatchTransferResponse body = payouts.performPostRequest(
             uriBuilder.toString(),
@@ -111,7 +111,7 @@ public class Transfers {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_BATCH_TRANSFER_STATUS_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     uriBuilder.addParameter("batchTransferId", batchTransferId);
 

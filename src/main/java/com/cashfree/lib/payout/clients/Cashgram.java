@@ -1,5 +1,6 @@
 package com.cashfree.lib.payout.clients;
 
+import com.cashfree.lib.exceptions.UnknownExceptionOccured;
 import com.cashfree.lib.payout.domains.CashgramDetails;
 import com.cashfree.lib.payout.domains.response.CfPayoutsResponse;
 import com.cashfree.lib.payout.domains.request.DeactivateCashgramRequest;
@@ -27,7 +28,7 @@ public class Cashgram {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.CREATE_CASHGRAM_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     CashgramCreationResponse body = payouts.performPostRequest(
             uriBuilder.toString(),
@@ -52,7 +53,7 @@ public class Cashgram {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_CASHGRAM_STATUS_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     uriBuilder.addParameter("cashgramId", cashgramId);
 
@@ -74,7 +75,7 @@ public class Cashgram {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.DEACTIVATE_CASHGRAM_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     CfPayoutsResponse body = payouts.performPostRequest(
             uriBuilder.toString(),

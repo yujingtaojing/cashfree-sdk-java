@@ -13,6 +13,7 @@ import com.cashfree.lib.exceptions.IllegalPayloadException;
 import com.cashfree.lib.exceptions.ResourceDoesntExistException;
 import com.cashfree.lib.exceptions.ResourceAlreadyExistsException;
 
+import com.cashfree.lib.exceptions.UnknownExceptionOccured;
 import com.cashfree.lib.payout.clients.Payouts;
 import com.cashfree.lib.payout.clients.Cashgram;
 import com.cashfree.lib.payout.clients.Transfers;
@@ -59,8 +60,7 @@ public class PayoutExperiments {
     log.info("" + isTokenValid);
 
     if (!isTokenValid) {
-      System.out.println("INVALID TOKEN");
-      return;
+      throw new RuntimeException("INVALID TOKEN");
     }
 
     testPayoutEndpoints(payouts);

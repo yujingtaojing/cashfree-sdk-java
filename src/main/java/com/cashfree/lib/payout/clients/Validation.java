@@ -29,7 +29,7 @@ public class Validation {
       uriBuilder =
           new URIBuilder(Payouts.getEndpoint() + PayoutConstants.VALIDATION_BANK_DETAILS_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     uriBuilder.addParameter("name", name);
     uriBuilder.addParameter("phone", phone);
@@ -54,7 +54,7 @@ public class Validation {
       uriBuilder =
           new URIBuilder(Payouts.getEndpoint() + PayoutConstants.VALIDATION_UPI_DETAILS_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     uriBuilder.addParameter("name", name);
     uriBuilder.addParameter("vpa", vpa);
@@ -76,7 +76,7 @@ public class Validation {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.BULK_VALIDATION_BANK_DETAILS_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     BulkValidationResponse body = payouts.performPostRequest(
             uriBuilder.toString(),
@@ -103,7 +103,7 @@ public class Validation {
       uriBuilder =
               new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_BULK_VALIDATION_STATUS_REL_URL);
     } catch (Exception e) {
-      e.printStackTrace();
+     throw new UnknownExceptionOccured(e.getMessage());
     }
     uriBuilder.addParameter("bulkValidationId", bulkValidationId);
     if (CommonUtils.isNotBlank(bankAccount)) {

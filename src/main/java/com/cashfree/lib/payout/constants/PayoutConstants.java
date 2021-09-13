@@ -4,7 +4,6 @@ public class PayoutConstants {
   private static final String PAYOUT_REL_URL = "/payout";
 
   private static final String VERSION = "/v1";
-
   public static final String AUTH_REL_URL = PAYOUT_REL_URL + VERSION + "/authorize";
 
   public static final String VERIFY_TOKEN_REL_URL = PAYOUT_REL_URL + VERSION + "/verifyToken";

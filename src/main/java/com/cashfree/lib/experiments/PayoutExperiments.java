@@ -44,8 +44,8 @@ public class PayoutExperiments {
   
   public static void main(String[] args) {
 
-    String clientId = "CF27JBMB8GN4CHAQI6Q";
-    String clientSecret = "fd48e5a6084d611e4fd9c6f0f8fcbca16d221ace";
+    String clientId = "client_id";
+    String clientSecret = "client_secret";
     Environment env = Environment.TEST;
     String publicKeyPath = "";
     Payouts payouts = Payouts.getInstance(
@@ -106,7 +106,7 @@ public class PayoutExperiments {
   private static void testValidationEndpoints(Validation validation) {
     log.info("" + validation.validateBankDetails(
             "JOHN Doe", "9908712345", "026291800001191", "YESB0000262"));
-    log.info("" + validation.validateUPIDetails("Shubhankar Saha", "success@upi"));
+    log.info("" + validation.validateUPIDetails("John Doe", "success@upi"));
 
 
     List<BulkValidationRequest.Payload> entries = new ArrayList<>();
@@ -116,10 +116,10 @@ public class PayoutExperiments {
         .setIfsc("SCBL0036078")
         .setPhone("9015991882"));
     entries.add(new BulkValidationRequest.Payload()
-        .setName("Shubhankar Saha")
-        .setBankAccount("387312345234")
-        .setIfsc("SBIN0021161")
-        .setPhone("9073397707"));
+            .setName("Sameera Cashfree")
+            .setBankAccount("0001001289877623")
+            .setIfsc("SBIN0008752")
+            .setPhone("9023991882"));
     String bulkValidationId = "javasdktest" + ThreadLocalRandom.current().nextInt(0, 1000000);
     BulkValidationRequest request = new BulkValidationRequest()
         .setBulkValidationId(bulkValidationId)

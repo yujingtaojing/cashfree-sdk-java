@@ -1,7 +1,15 @@
 package com.cashfree.lib.payout.clients;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.security.KeyFactory;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.time.Instant;
 import java.util.*;
 
+import com.cashfree.lib.constants.Constants;
+import com.cashfree.lib.exceptions.SignatureCreationFailedException;
 import com.cashfree.lib.payout.domains.response.CfPayoutsResponse;
 import com.cashfree.lib.payout.domains.response.GetBalanceResponse;
 import com.cashfree.lib.payout.domains.request.SelfWithdrawalRequest;
@@ -16,21 +24,30 @@ import com.cashfree.lib.exceptions.InvalidCredentialsException;
 
 import com.cashfree.lib.http.HttpUtils;
 import com.cashfree.lib.payout.domains.response.SelfWithdrawalResponse;
+import com.cashfree.lib.utils.ExceptionThrower;
+import org.apache.http.client.utils.URIBuilder;
+
+import javax.crypto.Cipher;
+
+import static com.cashfree.lib.constants.Constants.IP;
+import static com.cashfree.lib.constants.Constants.SIGNATURE;
 
 public class Payouts {
 
   private String clientId;
   private String clientSecret;
-
-  private String endpoint;
+  private String publicKeyPath;
+  private static String mode;
+  private static String endpoint;
   private String bearerToken;
 
+  private Long expiry;
   private static Payouts SINGLETON_INSTANCE;
 
   private Payouts(Environment env, String clientId, String clientSecret) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-
+    this.mode = IP;
     if (Environment.PRODUCTION.equals(env)) {
       this.endpoint = Endpoints.PROD_ENDPOINT;
     } else if (Environment.TEST.equals(env)) {
@@ -38,9 +55,40 @@ public class Payouts {
     }
   }
 
-  public static Payouts getInstance(Environment env, String clientId, String clientSecret) {
+  private Payouts(Environment env, String clientId, String clientSecret , String publicKeyPath) {
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    if (publicKeyPath.length() == 0)
+      this.mode = IP ;
+    else
+      this.mode = SIGNATURE;
+
+    if (Environment.PRODUCTION.equals(env)) {
+      this.endpoint = Endpoints.PROD_ENDPOINT;
+    } else if (Environment.TEST.equals(env)) {
+      this.endpoint = Endpoints.TEST_ENDPOINT;
+    }
+    this.publicKeyPath = publicKeyPath;
+  }
+
+  public static String getEndpoint() { return endpoint;}
+
+  public static Payouts  getInstance(Environment env, String clientId, String clientSecret, String pubilcKeyPath) {
     if (SINGLETON_INSTANCE == null) {
-      SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret);
+      if (pubilcKeyPath.length() == 0){
+        SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret);
+      }
+      else
+      {
+        SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret , pubilcKeyPath);
+      }
+    }
+    return SINGLETON_INSTANCE;
+  }
+
+  public static Payouts getInstance(Environment env, String clientId, String clientSecret ) {
+    if (SINGLETON_INSTANCE == null) {
+        SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret);
     }
     return SINGLETON_INSTANCE;
   }
@@ -66,33 +114,57 @@ public class Payouts {
     headersMap.put("X-Client-Id", clientId);
     headersMap.put("X-Client-Secret", clientSecret);
 
+    if (mode == "SIGNATURE"){
+      String signature = generateEncryptedSignature(clientId, publicKeyPath);
+      if (signature == ""){
+        throw new SignatureCreationFailedException();
+      }
+      headersMap.put("X-Cf-Signature", signature);
+    }
+
+    URIBuilder uriBuilder = null;
+    try {
+      uriBuilder =
+              new URIBuilder(Payouts.getEndpoint() + PayoutConstants.AUTH_REL_URL);
+    } catch (Exception e) {
+     throw new UnknownExceptionOccured(e.getMessage());
+    }
     AuthenticationResponse body =
         HttpUtils.performPostRequest(
-            endpoint + PayoutConstants.AUTH_REL_URL, headersMap, null, AuthenticationResponse.class);
+                uriBuilder.toString(), headersMap, null, AuthenticationResponse.class);
 
     if (body == null) {
       throw new UnknownExceptionOccured();
     }
-    if (200 == body.getSubCode()) {
+    if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       if (body.getData() == null) {
         throw new UnknownExceptionOccured();
       }
       bearerToken = body.getData().getToken();
-    } else if (401 == body.getSubCode()) {
-      throw new InvalidCredentialsException();
+      expiry = body.getData().getExpiry();
     }
+    ExceptionThrower.throwException(body.getSubCode() ,
+            body.getXRequestId(),
+            body.getMessage());
   }
 
   public boolean verifyToken() {
     Map<String, String> authHeaders = buildAuthHeader();
+    URIBuilder uriBuilder = null;
+    try {
+      uriBuilder =
+              new URIBuilder(Payouts.getEndpoint() + PayoutConstants.VERIFY_TOKEN_REL_URL);
+    } catch (Exception e) {
+     throw new UnknownExceptionOccured(e.getMessage());
+    }
     CfPayoutsResponse body =
         HttpUtils.performPostRequest(
-            endpoint + PayoutConstants.VERIFY_TOKEN_REL_URL, authHeaders, null, CfPayoutsResponse.class);
+                uriBuilder.toString(), authHeaders, null, CfPayoutsResponse.class);
 
     if (body == null) {
       throw new UnknownExceptionOccured();
     }
-    if (200 == body.getSubCode()) {
+    if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return true;
     } else if (403 == body.getSubCode()) {
       return false;
@@ -105,7 +177,7 @@ public class Payouts {
     Map<String, String> authHeaders = buildAuthHeader();
 
     Response body =
-        HttpUtils.performPostRequest(endpoint + relUrl, authHeaders, request, clazz);
+        HttpUtils.performPostRequest( relUrl, authHeaders, request, clazz);
 
     if (body == null) {
       throw new UnknownExceptionOccured();
@@ -124,7 +196,7 @@ public class Payouts {
   <Response extends CfPayoutsResponse> Response performGetRequest(String relUrl, Class<Response> clazz) {
     Map<String, String> authHeaders = buildAuthHeader();
     Response body =
-        HttpUtils.performGetRequest(endpoint + relUrl, authHeaders, clazz);
+        HttpUtils.performGetRequest(relUrl, authHeaders, clazz);
     if (body == null) {
       throw new UnknownExceptionOccured();
     }
@@ -136,21 +208,64 @@ public class Payouts {
   }
 
   public GetBalanceResponse getBalance() {
+    URIBuilder uriBuilder = null;
+    try {
+      uriBuilder =
+              new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_BALANCE_REL_URL);
+    } catch (Exception e) {
+     throw new UnknownExceptionOccured(e.getMessage());
+    }
     GetBalanceResponse body = performGetRequest(
-        PayoutConstants.GET_BALANCE_REL_URL, GetBalanceResponse.class);
-    if (200 == body.getSubCode()) {
+            uriBuilder.toString(), GetBalanceResponse.class);
+    if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return body;
     }
-    throw new UnknownExceptionOccured("Unable to fetch beneficiary id");
+    ExceptionThrower.throwException(body.getSubCode() ,
+            body.getXRequestId(),
+            "Unable to fetch beneficiary id\n." + body.getMessage());
+    return body;
   }
 
   public SelfWithdrawalResponse selfWithdrawal(SelfWithdrawalRequest selfWithdrawalRequest) {
+    URIBuilder uriBuilder = null;
+    try {
+      uriBuilder =
+              new URIBuilder(Payouts.getEndpoint() + PayoutConstants.SELF_WITHDRAWAL_REL_URL);
+    } catch (Exception e) {
+     throw new UnknownExceptionOccured(e.getMessage());
+    }
     SelfWithdrawalResponse body = performPostRequest(
-        PayoutConstants.SELF_WITHDRAWAL_REL_URL, selfWithdrawalRequest, SelfWithdrawalResponse.class);
+            uriBuilder.toString(), selfWithdrawalRequest, SelfWithdrawalResponse.class);
 
     if (200 == body.getStatusCode() || 400 == body.getStatusCode()) {
       return body;
     }
-    throw new UnknownExceptionOccured(body.getMessage());
+    ExceptionThrower.throwException(body.getSubCode() ,
+            body.getXRequestId(),
+            body.getMessage());
+    return  body;
+  }
+
+  private String generateEncryptedSignature(String clientId , String pathname) {
+    String clientIdWithEpochTimeStamp = clientId+"."+ Instant.now().getEpochSecond();
+    String encrytedSignature = "";
+    try {
+      byte[] keyBytes = Files
+              .readAllBytes(new File(pathname).toPath()); // Absolute Path to be replaced
+
+      String publicKeyContent = new String(keyBytes);
+      publicKeyContent = publicKeyContent.replaceAll("[\\t\\n\\r]", "")
+              .replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
+      KeyFactory kf = KeyFactory.getInstance("RSA");
+      X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(
+              Base64.getDecoder().decode(publicKeyContent));
+      RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
+      final Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-1AndMGF1Padding");
+      cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+      encrytedSignature = Base64.getEncoder().encodeToString(cipher.doFinal(clientIdWithEpochTimeStamp.getBytes()));
+    } catch (Exception e) {
+      throw new SignatureCreationFailedException(e.getMessage());
+    }
+    return encrytedSignature;
   }
 }

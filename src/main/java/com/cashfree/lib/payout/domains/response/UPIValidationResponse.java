@@ -17,6 +17,6 @@ public class UPIValidationResponse extends CfPayoutsResponse {
   public static final class Payload {
     private String nameAtBank;
 
-    private String accounExists;
+    private String accountExists;
   }
 }

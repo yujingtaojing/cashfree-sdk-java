@@ -11,4 +11,6 @@ public class CfPayoutsResponse {
   private Integer subCode;
 
   private String message;
+
+  private String xRequestId;
 }

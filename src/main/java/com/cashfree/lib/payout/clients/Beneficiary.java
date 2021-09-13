@@ -4,13 +4,16 @@ import com.cashfree.lib.exceptions.IllegalPayloadException;
 import com.cashfree.lib.exceptions.ResourceAlreadyExistsException;
 import com.cashfree.lib.exceptions.ResourceDoesntExistException;
 import com.cashfree.lib.exceptions.UnknownExceptionOccured;
-import com.cashfree.lib.http.UriBuilder;
 import com.cashfree.lib.payout.constants.PayoutConstants;
 import com.cashfree.lib.payout.domains.BeneficiaryDetails;
 import com.cashfree.lib.payout.domains.request.RemoveBeneficiaryRequest;
 import com.cashfree.lib.payout.domains.response.CfPayoutsResponse;
 import com.cashfree.lib.payout.domains.response.GetBeneficiaryIdResponse;
 import com.cashfree.lib.payout.domains.response.GetBeneficiaryResponse;
+import com.cashfree.lib.utils.ExceptionThrower;
+import org.apache.http.client.utils.URIBuilder;
+
+import java.net.MalformedURLException;
 
 public class Beneficiary {
   private Payouts payouts;
@@ -20,61 +23,102 @@ public class Beneficiary {
   }
 
   public boolean addBeneficiary(BeneficiaryDetails beneficiary) {
+    URIBuilder uriBuilder = null;
+    try {
+      uriBuilder =
+              new URIBuilder(Payouts.getEndpoint() + PayoutConstants.ADD_BENEFICIARY_REL_URL);
+    } catch (Exception e) {
+      throw new UnknownExceptionOccured(e.getMessage());
+    }
     CfPayoutsResponse body = payouts.performPostRequest(
-        PayoutConstants.ADD_BENEFICIARY_REL_URL,
+            uriBuilder.toString(),
         beneficiary,
         CfPayoutsResponse.class);
-    if (200 == body.getSubCode()) {
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
+
+    if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return true;
     } else if (409 == body.getSubCode()) {
-      throw new ResourceAlreadyExistsException("Beneficiary Id already exists");
+      throw new ResourceAlreadyExistsException("Beneficiary Id already exists.\n" +  msg);
     } else if (412 == body.getSubCode()) {
-      throw new UnknownExceptionOccured("Post data is empty or not a valid JSON.");
+      throw new UnknownExceptionOccured("Post data is empty or not a valid JSON.\n" +  msg);
     } else if (422 == body.getSubCode()) {
-      throw new IllegalArgumentException("Please provide a valid Beneficiary Id.");
+      throw new IllegalArgumentException("Please provide a valid Beneficiary Id.\n" +  msg);
+    }
+    else{
+      ExceptionThrower.throwException(body.getSubCode() , body.getXRequestId(), body.getMessage());
     }
     return false;
   }
 
   public GetBeneficiaryResponse.Payload getBeneficiaryDetails(String beneId) {
+    URIBuilder uriBuilder = null;
+    try {
+      uriBuilder =
+              new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_BENEFICIARY_REL_URL + "/" + beneId);
+    } catch (Exception e) {
+     throw new UnknownExceptionOccured(e.getMessage());
+    }
     GetBeneficiaryResponse body = payouts.performGetRequest(
-        PayoutConstants.GET_BENEFICIARY_REL_URL + "/" + beneId, GetBeneficiaryResponse.class);
-    if (200 == body.getSubCode()) {
+            uriBuilder.toString(), GetBeneficiaryResponse.class);
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
+    if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return body.getData();
     } else if (404 == body.getSubCode()) {
-      throw new ResourceDoesntExistException("Beneficiary does not exist");
+      throw new ResourceDoesntExistException("Beneficiary does not exist\n" +  msg);
     }
-    throw new UnknownExceptionOccured("Unable to fetch beneficiary details");
+      ExceptionThrower.throwException(body.getSubCode() ,
+              body.getXRequestId(),
+              "Unable to fetch Benificiary details. " +body.getMessage());
+    return  body.getData();
   }
 
   public String getBeneficiaryId(String bankAccount, String ifsc) {
+    URIBuilder uriBuilder = null;
+    try {
+      uriBuilder =
+              new URIBuilder(Payouts.getEndpoint() + PayoutConstants.GET_BENE_ID_REL_URL);
+    } catch (Exception e) {
+     throw new UnknownExceptionOccured(e.getMessage());
+    }
 
-    UriBuilder uri = UriBuilder.fromUriString(PayoutConstants.GET_BENE_ID_REL_URL)
-        .queryParam("bankAccount", bankAccount)
-        .queryParam("ifsc", ifsc);
+    uriBuilder.addParameter("bankAccount", bankAccount);
+    uriBuilder.addParameter("ifsc", ifsc);
 
     GetBeneficiaryIdResponse body = payouts.performGetRequest(
-        uri.toUriString(), GetBeneficiaryIdResponse.class);
-
-    if (200 == body.getSubCode()) {
+            uriBuilder.toString(), GetBeneficiaryIdResponse.class);
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
+    if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return body.getData().getBeneId();
     } else if (404 == body.getSubCode() || 403 == body.getSubCode()) {
-      throw new ResourceDoesntExistException("Beneficiary not found with given bank account details");
+      throw new ResourceDoesntExistException("Beneficiary not found with given bank account details.\n" +  msg);
     }
-    throw new UnknownExceptionOccured("Unable to fetch beneficiary id");
+    ExceptionThrower.throwException(body.getSubCode() ,
+            body.getXRequestId(),
+            "Unable to fetch Benificiary id. " +body.getMessage());
+    return "";
   }
 
   public boolean removeBeneficiary(String beneId) {
+    URIBuilder uriBuilder = null;
+    try {
+      uriBuilder =
+              new URIBuilder(Payouts.getEndpoint() + PayoutConstants.REMOVE_BENEFICIARY_REL_URL);
+    } catch (Exception e) {
+     throw new UnknownExceptionOccured(e.getMessage());
+    }
     CfPayoutsResponse body = payouts.performPostRequest(
-        PayoutConstants.REMOVE_BENEFICIARY_REL_URL, new RemoveBeneficiaryRequest().setBeneId(beneId), CfPayoutsResponse.class);
-
-    if (200 == body.getSubCode()) {
+            uriBuilder.toString(), new RemoveBeneficiaryRequest().setBeneId(beneId), CfPayoutsResponse.class);
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
+    if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return true;
     } else if (404 == body.getSubCode()) {
-      throw new ResourceDoesntExistException("Beneficiary does not exist with given Id");
+      throw new ResourceDoesntExistException("Beneficiary does not exist with given Id\n" +  msg);
     } else if (412 == body.getSubCode()) {
-      throw new IllegalPayloadException("beneId missing in the request");
+      throw new IllegalPayloadException("beneId missing in the request\n" +  msg);
     }
-    throw new UnknownExceptionOccured("Unable to remove beneficiary with id " + beneId);
+    ExceptionThrower.throwException(body.getSubCode() ,
+            body.getXRequestId(),("Unable to remove beneficiary with id " + beneId + "\n" + body.getMessage()));
+    return false;
   }
 }

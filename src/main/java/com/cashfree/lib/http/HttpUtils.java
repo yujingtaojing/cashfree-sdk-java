@@ -36,7 +36,8 @@ public class HttpUtils {
     }
     conn.setRequestProperty("Content-Type", "application/json; utf-8");
     conn.setRequestProperty("Accept", "application/json");
-    conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+    conn.setRequestProperty("cache-control", "no-cache");
+    conn.setRequestProperty("User-Agent", "Cashfree-SDK");
     return conn;
   }
 
@@ -90,6 +91,10 @@ public class HttpUtils {
       while ((responseLine = br.readLine()) != null) {
         response.append(responseLine.trim());
       }
+      response = new StringBuilder(response.substring(0, response.length() - 1));
+      response.append(",\"xRequestId\":\"");
+      response.append(conn.getHeaderField("X-Request-Id"));
+      response.append("\"}");
     } catch (IOException x) {
       throw new RuntimeException(x);
     }
@@ -99,7 +104,6 @@ public class HttpUtils {
   private static Pair<Integer, String> fetchPostResponseFromServer(HttpURLConnection conn, String request) {
     int responseCode = sendDataToUrlConn(conn, request);
     String response = extractResponseFromUrlConn(conn);
-
     return new ImmutablePair<>(responseCode, response);
   }
 

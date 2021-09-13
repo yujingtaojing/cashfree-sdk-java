@@ -48,7 +48,6 @@ public class ObjectReaderUtils {
     for (Field field: ObjectMappingUtils.getAllFields(clazz)) {
       String fieldName = field.getName();
       Class<?> fieldClass = field.getType();
-
       JsonValue jsonValue = jsonObject.get(fieldName);
       if (jsonValue == null || jsonValue.isNull()) continue;
       setField(field, instance, getFieldInstance(jsonValue, fieldClass, field));

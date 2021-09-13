@@ -8,6 +8,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
 import java.util.*;
 
+import com.cashfree.lib.constants.Constants;
 import com.cashfree.lib.exceptions.SignatureCreationFailedException;
 import com.cashfree.lib.payout.domains.response.CfPayoutsResponse;
 import com.cashfree.lib.payout.domains.response.GetBalanceResponse;
@@ -36,7 +37,7 @@ public class Payouts {
   private String clientId;
   private String clientSecret;
   private String publicKeyPath;
-  private String mode;
+  private static String mode;
   private static String endpoint;
   private String bearerToken;
 
@@ -46,7 +47,7 @@ public class Payouts {
   private Payouts(Environment env, String clientId, String clientSecret) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.mode = "IP";
+    this.mode = IP;
     if (Environment.PRODUCTION.equals(env)) {
       this.endpoint = Endpoints.PROD_ENDPOINT;
     } else if (Environment.TEST.equals(env)) {
@@ -71,12 +72,25 @@ public class Payouts {
   }
 
   public static String getEndpoint() { return endpoint;}
-  public static Payouts getInstance(Environment env, String clientId, String clientSecret , String pubilcKeyPath) {
+
+  public Payouts  getInstance(Environment env, String clientId, String clientSecret, String pubilcKeyPath) {
     if (SINGLETON_INSTANCE == null) {
-      if (pubilcKeyPath.length() == 0)
-          SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret);
+      if (pubilcKeyPath.length() == 0){
+        this.mode = IP;
+        SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret);
+      }
       else
+      {
+        this.mode = SIGNATURE;
         SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret , pubilcKeyPath);
+      }
+    }
+    return SINGLETON_INSTANCE;
+  }
+
+  public static Payouts getInstance(Environment env, String clientId, String clientSecret ) {
+    if (SINGLETON_INSTANCE == null) {
+        SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret);
     }
     return SINGLETON_INSTANCE;
   }

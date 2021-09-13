@@ -44,15 +44,14 @@ public class PayoutExperiments {
   
   public static void main(String[] args) {
 
-    String clientId = "client_id";
-    String clientSecret = "client_secret";
+    String clientId = "Client_id";
+    String clientSecret = "Client_secret";
     Environment env = Environment.TEST;
     String publicKeyPath = "";
     Payouts payouts = Payouts.getInstance(
             env,
             clientId,
-            clientSecret,
-            publicKeyPath );
+            clientSecret);
 
     log.info("" + payouts.init());
 

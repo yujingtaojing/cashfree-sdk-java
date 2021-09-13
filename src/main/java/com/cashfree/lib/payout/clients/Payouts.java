@@ -73,15 +73,13 @@ public class Payouts {
 
   public static String getEndpoint() { return endpoint;}
 
-  public Payouts  getInstance(Environment env, String clientId, String clientSecret, String pubilcKeyPath) {
+  public static Payouts  getInstance(Environment env, String clientId, String clientSecret, String pubilcKeyPath) {
     if (SINGLETON_INSTANCE == null) {
       if (pubilcKeyPath.length() == 0){
-        this.mode = IP;
         SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret);
       }
       else
       {
-        this.mode = SIGNATURE;
         SINGLETON_INSTANCE = new Payouts(env, clientId, clientSecret , pubilcKeyPath);
       }
     }

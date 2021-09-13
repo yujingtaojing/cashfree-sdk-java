@@ -10,7 +10,6 @@ public class Constants {
   public static final String PLACEHOLDER_DATESTRING = "0000-00-00 00:00:00";
 
   public static final String IP = "IP";
-
   public static final String SIGNATURE = "SIGNATURE";
 
 

@@ -32,7 +32,7 @@ public class Beneficiary {
             uriBuilder.toString(),
         beneficiary,
         CfPayoutsResponse.class);
-    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getRequestId();
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
 
     if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return true;
@@ -44,7 +44,7 @@ public class Beneficiary {
       throw new IllegalArgumentException("Please provide a valid Beneficiary Id.\n" +  msg);
     }
     else{
-      ExceptionThrower.throwException(body.getSubCode() , body.getRequestId(), body.getMessage());
+      ExceptionThrower.throwException(body.getSubCode() , body.getXRequestId(), body.getMessage());
     }
     return false;
   }
@@ -59,14 +59,14 @@ public class Beneficiary {
     }
     GetBeneficiaryResponse body = payouts.performGetRequest(
             uriBuilder.toString(), GetBeneficiaryResponse.class);
-    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getRequestId();
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
     if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return body.getData();
     } else if (404 == body.getSubCode()) {
       throw new ResourceDoesntExistException("Beneficiary does not exist\n" +  msg);
     }
       ExceptionThrower.throwException(body.getSubCode() ,
-              body.getRequestId(),
+              body.getXRequestId(),
               "Unable to fetch Benificiary details. " +body.getMessage());
     return  body.getData();
   }
@@ -85,14 +85,14 @@ public class Beneficiary {
 
     GetBeneficiaryIdResponse body = payouts.performGetRequest(
             uriBuilder.toString(), GetBeneficiaryIdResponse.class);
-    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getRequestId();
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
     if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return body.getData().getBeneId();
     } else if (404 == body.getSubCode() || 403 == body.getSubCode()) {
       throw new ResourceDoesntExistException("Beneficiary not found with given bank account details.\n" +  msg);
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             "Unable to fetch Benificiary id. " +body.getMessage());
     return "";
   }
@@ -107,7 +107,7 @@ public class Beneficiary {
     }
     CfPayoutsResponse body = payouts.performPostRequest(
             uriBuilder.toString(), new RemoveBeneficiaryRequest().setBeneId(beneId), CfPayoutsResponse.class);
-    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getRequestId();
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
     if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return true;
     } else if (404 == body.getSubCode()) {
@@ -116,7 +116,7 @@ public class Beneficiary {
       throw new IllegalPayloadException("beneId missing in the request\n" +  msg);
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),("Unable to remove beneficiary with id " + beneId + "\n" + body.getMessage()));
+            body.getXRequestId(),("Unable to remove beneficiary with id " + beneId + "\n" + body.getMessage()));
     return false;
   }
 }

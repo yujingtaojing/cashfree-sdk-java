@@ -12,5 +12,5 @@ public class CfPayoutsResponse {
 
   private String message;
 
-  private String requestId;
+  private String xRequestId;
 }

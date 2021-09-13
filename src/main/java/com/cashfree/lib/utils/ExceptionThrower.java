@@ -2,8 +2,8 @@ package com.cashfree.lib.utils;
 import com.cashfree.lib.exceptions.*;
 
 public class ExceptionThrower {
-  public static void throwException(int resCode, String requestId, String message) {
-    String msg = "Message : "+ message + " | X-Request-Id: " + requestId;
+  public static void throwException(int resCode, String xRequestId, String message) {
+    String msg = "Message : "+ message + " | X-Request-Id: " + xRequestId;
     switch (resCode) {
       case 400:
         throw new BadRequestException(msg);

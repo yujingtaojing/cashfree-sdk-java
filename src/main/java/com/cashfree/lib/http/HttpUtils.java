@@ -92,7 +92,7 @@ public class HttpUtils {
         response.append(responseLine.trim());
       }
       response = new StringBuilder(response.substring(0, response.length() - 1));
-      response.append(",\"requestId\":\"");
+      response.append(",\"xRequestId\":\"");
       response.append(conn.getHeaderField("X-Request-Id"));
       response.append("\"}");
     } catch (IOException x) {

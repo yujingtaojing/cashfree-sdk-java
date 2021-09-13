@@ -122,7 +122,7 @@ public class Payouts {
       bearerToken = body.getData().getToken();
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
   }
 
@@ -199,7 +199,7 @@ public class Payouts {
       return body;
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             "Unable to fetch beneficiary id\n." + body.getMessage());
     return body;
   }
@@ -219,7 +219,7 @@ public class Payouts {
       return body;
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
     return  body;
   }

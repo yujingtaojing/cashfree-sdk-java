@@ -44,7 +44,7 @@ public class Transfers {
       return body;
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
     return body;
   }
@@ -68,14 +68,14 @@ public class Transfers {
       uriBuilder.addParameter("referenceId", referenceId);
     }
     GetTransferResponse body = payouts.performGetRequest(uriBuilder.toString(), GetTransferResponse.class);
-    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getRequestId();
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
     if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return body;
     } else if (404 == body.getSubCode()) {
       throw new ResourceDoesntExistException("Transfer with given details is invalid or does not exist\n" + msg);
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
     return  body;
   }
@@ -100,7 +100,7 @@ public class Transfers {
       throw new IllegalPayloadException("Parameters missing in request");
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
     return  body;
   }
@@ -122,7 +122,7 @@ public class Transfers {
       throw new IllegalPayloadException("Batch Transfer Id does not exist");
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
     return body;
   }

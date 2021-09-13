@@ -43,7 +43,7 @@ public class Validation {
       throw new ResourceDoesntExistException("Please provide a valid IFSC code");
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
     return body.getData();
   }
@@ -66,7 +66,7 @@ public class Validation {
       throw new ResourceDoesntExistException("Either VPA or name is invalid");
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
     return body.getData();
   }
@@ -90,7 +90,7 @@ public class Validation {
       throw new ResourceAlreadyExistsException("Mandatory Parameters missing in the request");
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
     return body;
   }
@@ -120,7 +120,7 @@ public class Validation {
       throw new ResourceDoesntExistException("Bulk Validation Id does not exist");
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             body.getMessage());
     return  body.getData();
   }

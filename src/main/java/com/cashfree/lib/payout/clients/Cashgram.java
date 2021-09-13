@@ -33,7 +33,7 @@ public class Cashgram {
             uriBuilder.toString(),
         cashgram,
         CashgramCreationResponse.class);
-    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getRequestId();
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
     if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return body;
     } else if (409 == body.getSubCode()) {
@@ -42,7 +42,7 @@ public class Cashgram {
       throw new IllegalPayloadException(msg);
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(), "Unable to create cashgram." + body.getMessage());
+            body.getXRequestId(), "Unable to create cashgram." + body.getMessage());
     return body;
   }
 
@@ -57,14 +57,14 @@ public class Cashgram {
     uriBuilder.addParameter("cashgramId", cashgramId);
 
     GetCashgramStatusResponse body = payouts.performGetRequest(uriBuilder.toString(), GetCashgramStatusResponse.class);
-    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getRequestId();
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
     if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return body;
     } else if (404 == body.getSubCode()) {
       throw new ResourceDoesntExistException("Cashgram with id " + cashgramId + " does not exists\n" + msg);
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(), "Unable to fetch cashgram for id " + cashgramId + "\n" + body.getMessage());
+            body.getXRequestId(), "Unable to fetch cashgram for id " + cashgramId + "\n" + body.getMessage());
     return body;
   }
 
@@ -80,7 +80,7 @@ public class Cashgram {
             uriBuilder.toString(),
         new DeactivateCashgramRequest().setCashgramId(cashgramId),
         CfPayoutsResponse.class);
-    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getRequestId();
+    String msg = "Message : "+ body.getMessage() + " | X-Request-Id: " + body.getXRequestId();
     if (200 == body.getSubCode() || 201 == body.getSubCode() || 202 == body.getSubCode()) {
       return body;
     } else if (412 == body.getSubCode()) {
@@ -89,7 +89,7 @@ public class Cashgram {
       throw new ResourceDoesntExistException("Cashgram with id " + cashgramId + " does not exists.\n" + msg);
     }
     ExceptionThrower.throwException(body.getSubCode() ,
-            body.getRequestId(),
+            body.getXRequestId(),
             "Unable to fetch cashgram for id, " + cashgramId + "\n" + body.getMessage());
     return body;
   }

@@ -22,8 +22,6 @@ public class BatchTransferRequest {
 
   private List<Payload> batch;
 
-  private String paymentInstrumentId;
-
   @Data
   @Accessors(chain = true)
   public static final class Payload {

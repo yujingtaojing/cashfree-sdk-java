@@ -142,6 +142,7 @@ public class Payouts {
       }
       bearerToken = body.getData().getToken();
       expiry = body.getData().getExpiry();
+      return;
     }
     ExceptionThrower.throwException(body.getSubCode() ,
             body.getXRequestId(),

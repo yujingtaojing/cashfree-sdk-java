@@ -39,7 +39,7 @@ public class Payouts {
   private String publicKeyPath;
   private static String mode;
   private static String endpoint;
-  private String bearerToken;
+  private volatile String bearerToken;
 
   private Long expiry;
   private static Payouts SINGLETON_INSTANCE;
@@ -108,7 +108,7 @@ public class Payouts {
     return headers;
   }
 
-  void updateBearerToken() {
+  synchronized void updateBearerToken() {
     // Setup headers.
     Map<String, String> headersMap = new HashMap<>();
     headersMap.put("X-Client-Id", clientId);
@@ -188,7 +188,7 @@ public class Payouts {
     }
     if (403 == body.getSubCode()) {
       updateBearerToken();
-      performPostRequest(relUrl, request, clazz);
+      return performPostRequest(relUrl, request, clazz);
     }
     return body;
   }
@@ -202,7 +202,7 @@ public class Payouts {
     }
     if (403 == body.getSubCode()) {
       updateBearerToken();
-      performGetRequest(relUrl, clazz);
+      return performGetRequest(relUrl, clazz);
     }
     return body;
   }
